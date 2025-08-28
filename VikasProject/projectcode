@@ -1,0 +1,107 @@
+#include <stdio.h>
+#include <string.h>
+#include <strings.h>  // For strcasecmp()
+
+#define MAX 100
+
+typedef struct {
+    char name[50];
+    int marks;
+    float timeTaken;  // in minutes
+} Student;
+
+// Sort students by marks (desc), then time (asc)
+void sortByMarks(Student s[], int n) {
+    Student temp;
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if ((s[j].marks < s[j + 1].marks) ||
+                (s[j].marks == s[j + 1].marks && s[j].timeTaken > s[j + 1].timeTaken)) {
+                temp = s[j];
+                s[j] = s[j + 1];
+                s[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Sort students by time (asc), then marks (desc)
+void sortByTime(Student s[], int n) {
+    Student temp;
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if ((s[j].timeTaken > s[j + 1].timeTaken) ||
+                (s[j].timeTaken == s[j + 1].timeTaken && s[j].marks < s[j + 1].marks)) {
+                temp = s[j];
+                s[j] = s[j + 1];
+                s[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Case-insensitive search for a student by name
+int searchByName(Student s[], int n, char target[]) {
+    for (int i = 0; i < n; i++) {
+        if (strcasecmp(s[i].name, target) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int main() {
+    Student students[MAX];
+    int n;
+    char targetName[50];
+    char sortChoice[10];
+
+    printf("Enter number of students: ");
+    scanf("%d", &n);
+
+    // Input
+    for (int i = 0; i < n; i++) {
+        printf("\nEnter name of student %d:\n ", i + 1);
+        scanf("%s", students[i].name);
+        printf("Enter marks for %s: \n", students[i].name);
+        scanf("%d", &students[i].marks);
+        printf("Enter time taken by %s (in minutes):\n ", students[i].name);
+        scanf("%f", &students[i].timeTaken);
+    }
+
+    // Ask for sort preference
+    printf("\nSort by 'marks' or 'time'? ");
+    scanf("%s", sortChoice);
+
+    if (strcasecmp(sortChoice, "marks") == 0) {
+        sortByMarks(students, n);
+        printf("\nStudents sorted by marks (desc), then time (asc):\n");
+    } else if (strcasecmp(sortChoice, "time") == 0) {
+        sortByTime(students, n);
+        printf("\nStudents sorted by time (asc), then marks (desc):\n");
+    } else {
+        printf("Invalid choice. Defaulting to sort by marks.\n");
+        sortByMarks(students, n);
+    }
+
+    // Display sorted list
+    for (int i = 0; i < n; i++) {
+        printf("Rank %d: %s - %d marks, %.2f min\n",
+               i + 1, students[i].name, students[i].marks, students[i].timeTaken);
+    }
+
+    // Search by name
+    printf("\nEnter name to search: ");
+    scanf("%s", targetName);
+
+    int result = searchByName(students, n, targetName);
+    if (result != -1) {
+        printf("\nStudent %s found at rank %d\n", students[result].name, result + 1);
+        printf("Marks: %d, Time taken: %.2f min\n",
+               students[result].marks, students[result].timeTaken);
+    } else {
+        printf("Student %s not found.\n", targetName);
+    }
+
+    return 0;
+}
